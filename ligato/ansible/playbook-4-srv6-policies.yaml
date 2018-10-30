@@ -1,0 +1,103 @@
+# Copyright (c) 2018 Cisco Systems
+#
+# Author: Steven Barth <stbarth@cisco.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- hosts: localhost
+  gather_facts: no
+  connection: local
+  tasks:
+
+  - name: Configure Node 1 policy
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node1/vpp/config/v1/srv6/policy/fd11::13' | b64encode }}"
+        value: >
+          {{ '{
+            "bsid": "fd11::13",
+            "srh_encapsulation": true
+          }' | b64encode }}
+
+  - name: Configure Node 1 policy segment
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node1/vpp/config/v1/srv6/policy/fd11::13/segment/1' | b64encode }}"
+        value: >
+          {{ '{
+            "policy_bsid": "fd11::13",
+            "segments": ["fd33::101"]
+          }' | b64encode }}
+
+  - name: Configure Node 1 steering
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node1/vpp/config/v1/srv6/steering/fd30::1' | b64encode }}"
+        value: >
+          {{ '{
+            "policy_bsid": "fd11::13",
+            "l3_traffic": {
+              "prefix_address": "fd30::1/128"
+            }
+          }' | b64encode }}
+
+
+  - name: Configure Node 3 policy
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node3/vpp/config/v1/srv6/policy/fd33::31' | b64encode }}"
+        value: >
+          {{ '{
+            "bsid": "fd33::31",
+            "srh_encapsulation": true
+          }' | b64encode }}
+
+  - name: Configure Node 3 policy segment
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node3/vpp/config/v1/srv6/policy/fd33::31/segment/1' | b64encode }}"
+        value: >
+          {{ '{
+            "policy_bsid": "fd33::31",
+            "segments": ["fd11::101"]
+          }' | b64encode }}
+
+  - name: Configure Node 3 steering
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node3/vpp/config/v1/srv6/steering/fd10::1' | b64encode }}"
+        value: >
+          {{ '{
+            "policy_bsid": "fd33::31",
+            "l3_traffic": {
+              "prefix_address": "fd10::1/128"
+            }
+          }' | b64encode }}

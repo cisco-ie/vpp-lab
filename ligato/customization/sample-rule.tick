@@ -1,0 +1,99 @@
+// Copyright (c) 2018 Cisco Systems
+//
+// Author: Cristina Precup <cprecup@cisco.com>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+var db = 'telemetry'
+
+var rp = 'autogen'
+
+var measurement = 'vpp_node_counter_count'
+
+var groupBy = ['item', 'agent']
+
+var whereFilter = lambda: ("item" == 'ip6-icmp-input')
+
+var name = 'Sample Rule'
+
+var idVar = name + ':{{.Group}}'
+
+var message = ' {{.ID}} is {{.Name}} {{.TaskName}} {{.Group}} {{.Tags}} {{.Level}} {{ index .Fields "value" }} {{.Time}}'
+
+var idTag = 'alertID'
+
+var levelTag = 'level'
+
+var messageField = 'message'
+
+var durationField = 'duration'
+
+var outputDB = 'chronograf'
+
+var outputRP = 'autogen'
+
+var outputMeasurement = 'alerts'
+
+var triggerType = 'relative'
+
+var shift = 1m
+
+0s
+
+var crit = 2
+
+var data = stream
+    |from()
+        .database(db)
+        .retentionPolicy(rp)
+        .measurement(measurement)
+        .groupBy(groupBy)
+        .where(whereFilter)
+    |eval(lambda: "gauge")
+        .as('value')
+
+var past = data
+    |shift(shift)
+
+var current = data
+
+var trigger = past
+    |join(current)
+        .as('past', 'current')
+    |eval(lambda: float("current.value" - "past.value"))
+        .keep()
+        .as('value')
+    |alert()
+        .crit(lambda: "value" > crit)
+        .message(message)
+        .id(idVar)
+        .idTag(idTag)
+        .levelTag(levelTag)
+        .messageField(messageField)
+        .durationField(durationField)
+        .log('/tmp/alerts.log')
+
+trigger
+    |eval(lambda: float("value"))
+        .as('value')
+        .keep()
+    |influxDBOut()
+        .create()
+        .database(outputDB)
+        .retentionPolicy(outputRP)
+        .measurement(outputMeasurement)
+        .tag('alertName', name)
+        .tag('triggerType', triggerType)
+
+trigger
+    |httpOut('output')

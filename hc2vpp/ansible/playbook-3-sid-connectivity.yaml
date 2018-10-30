@@ -1,0 +1,229 @@
+# Copyright (c) 2018 Cisco Systems
+#
+# Author: Steven Barth <stbarth@cisco.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- hosts: localhost
+  gather_facts: no
+  connection: local
+  tasks:
+  - name: Configure Node 1 SID Connectivity
+    netconf_config:
+      host: node1
+      port: 2831
+      hostkey_verify: no
+      username: admin
+      password: admin
+      xml: |
+        <config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+          <routing xmlns="urn:ietf:params:xml:ns:yang:ietf-routing">
+            <control-plane-protocols>
+              <control-plane-protocol>
+                <type>static</type>
+                <name>learned-protocol-0</name>
+                <vpp-protocol-attributes xmlns="urn:ietf:params:xml:ns:yang:vpp-routing">
+                  <primary-vrf>0</primary-vrf>
+                </vpp-protocol-attributes>
+                <static-routes>
+                  <ipv6 xmlns="urn:ietf:params:xml:ns:yang:ietf-ipv6-unicast-routing">
+                    <route>
+                      <destination-prefix xmlns="urn:ietf:params:xml:ns:yang:ietf-ipv6-unicast-routing">fd22::/64</destination-prefix>
+                      <vpp-ipv6-route xmlns="urn:ietf:params:xml:ns:yang:vpp-ipv6-unicast-routing"/>         
+                      <next-hop xmlns="urn:ietf:params:xml:ns:yang:ietf-ipv6-unicast-routing">
+                          <outgoing-interface>host-eth0</outgoing-interface>
+                          <next-hop-address>::</next-hop-address>
+                      </next-hop>
+                    </route>
+                    <route>
+                      <destination-prefix xmlns="urn:ietf:params:xml:ns:yang:ietf-ipv6-unicast-routing">fd33::/64</destination-prefix>
+                      <vpp-ipv6-route xmlns="urn:ietf:params:xml:ns:yang:vpp-ipv6-unicast-routing"/>         
+                      <next-hop xmlns="urn:ietf:params:xml:ns:yang:ietf-ipv6-unicast-routing">
+                          <outgoing-interface>host-eth1</outgoing-interface>
+                          <next-hop-address>::</next-hop-address>
+                      </next-hop>
+                    </route>
+                  </ipv6>
+                </static-routes>
+              </control-plane-protocol>
+            </control-plane-protocols>
+          </routing>
+          <interfaces xmlns="urn:ietf:params:xml:ns:yang:ietf-interfaces">
+            <interface>
+              <name>host-eth0</name>
+              <ipv6 xmlns="urn:ietf:params:xml:ns:yang:ietf-ip">
+                <neighbor>
+                  <ip>fd22::100</ip>
+                  <link-layer-address>00:00:00:00:12:20</link-layer-address>
+                </neighbor>
+                <neighbor>
+                  <ip>fd22::101</ip>
+                  <link-layer-address>00:00:00:00:12:20</link-layer-address>
+                </neighbor>
+              </ipv6>
+            </interface>
+            <interface>
+              <name>host-eth1</name>
+              <ipv6 xmlns="urn:ietf:params:xml:ns:yang:ietf-ip">
+                <neighbor>
+                  <ip>fd33::100</ip>
+                  <link-layer-address>00:00:00:00:13:30</link-layer-address>
+                </neighbor>
+                <neighbor>
+                  <ip>fd33::101</ip>
+                  <link-layer-address>00:00:00:00:13:30</link-layer-address>
+                </neighbor>
+              </ipv6>
+            </interface>
+          </interfaces>
+        </config>
+
+  - name: Configure Node 2 SID Connectivity
+    netconf_config:
+      host: node2
+      port: 2831
+      hostkey_verify: no
+      username: admin
+      password: admin
+      xml: |
+        <config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+          <routing xmlns="urn:ietf:params:xml:ns:yang:ietf-routing">
+            <control-plane-protocols>
+              <control-plane-protocol>
+                <type>static</type>
+                <name>learned-protocol-0</name>
+                <vpp-protocol-attributes xmlns="urn:ietf:params:xml:ns:yang:vpp-routing">
+                  <primary-vrf>0</primary-vrf>
+                </vpp-protocol-attributes>
+                <static-routes>
+                  <ipv6 xmlns="urn:ietf:params:xml:ns:yang:ietf-ipv6-unicast-routing">
+                    <route>
+                      <destination-prefix xmlns="urn:ietf:params:xml:ns:yang:ietf-ipv6-unicast-routing">fd11::/64</destination-prefix>
+                      <vpp-ipv6-route xmlns="urn:ietf:params:xml:ns:yang:vpp-ipv6-unicast-routing"/>         
+                      <next-hop xmlns="urn:ietf:params:xml:ns:yang:ietf-ipv6-unicast-routing">
+                          <outgoing-interface>host-eth0</outgoing-interface>
+                          <next-hop-address>::</next-hop-address>
+                      </next-hop>
+                    </route>
+                    <route>
+                      <destination-prefix xmlns="urn:ietf:params:xml:ns:yang:ietf-ipv6-unicast-routing">fd33::/64</destination-prefix>
+                      <vpp-ipv6-route xmlns="urn:ietf:params:xml:ns:yang:vpp-ipv6-unicast-routing"/>         
+                      <next-hop xmlns="urn:ietf:params:xml:ns:yang:ietf-ipv6-unicast-routing">
+                          <outgoing-interface>host-eth1</outgoing-interface>
+                          <next-hop-address>::</next-hop-address>
+                      </next-hop>
+                    </route>
+                  </ipv6>
+                </static-routes>
+              </control-plane-protocol>
+            </control-plane-protocols>
+          </routing>
+          <interfaces xmlns="urn:ietf:params:xml:ns:yang:ietf-interfaces">
+            <interface>
+              <name>host-eth0</name>
+              <ipv6 xmlns="urn:ietf:params:xml:ns:yang:ietf-ip">
+                <neighbor>
+                  <ip>fd11::100</ip>
+                  <link-layer-address>00:00:00:00:12:10</link-layer-address>
+                </neighbor>
+                <neighbor>
+                  <ip>fd11::101</ip>
+                  <link-layer-address>00:00:00:00:12:10</link-layer-address>
+                </neighbor>
+              </ipv6>
+            </interface>
+            <interface>
+              <name>host-eth1</name>
+              <ipv6 xmlns="urn:ietf:params:xml:ns:yang:ietf-ip">
+                <neighbor>
+                  <ip>fd33::100</ip>
+                  <link-layer-address>00:00:00:00:23:30</link-layer-address>
+                </neighbor>
+                <neighbor>
+                  <ip>fd33::101</ip>
+                  <link-layer-address>00:00:00:00:23:30</link-layer-address>
+                </neighbor>
+              </ipv6>
+            </interface>
+          </interfaces>
+        </config>
+
+  - name: Configure Node 3 SID Connectivity
+    netconf_config:
+      host: node3
+      port: 2831
+      hostkey_verify: no
+      username: admin
+      password: admin
+      xml: |
+        <config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+          <routing xmlns="urn:ietf:params:xml:ns:yang:ietf-routing">
+            <control-plane-protocols>
+              <control-plane-protocol>
+                <type>static</type>
+                <name>learned-protocol-0</name>
+                <vpp-protocol-attributes xmlns="urn:ietf:params:xml:ns:yang:vpp-routing">
+                  <primary-vrf>0</primary-vrf>
+                </vpp-protocol-attributes>
+                <static-routes>
+                  <ipv6 xmlns="urn:ietf:params:xml:ns:yang:ietf-ipv6-unicast-routing">
+                    <route>
+                      <destination-prefix xmlns="urn:ietf:params:xml:ns:yang:ietf-ipv6-unicast-routing">fd11::/64</destination-prefix>
+                      <vpp-ipv6-route xmlns="urn:ietf:params:xml:ns:yang:vpp-ipv6-unicast-routing"/>         
+                      <next-hop xmlns="urn:ietf:params:xml:ns:yang:ietf-ipv6-unicast-routing">
+                          <outgoing-interface>host-eth0</outgoing-interface>
+                          <next-hop-address>::</next-hop-address>
+                      </next-hop>
+                    </route>
+                    <route>
+                      <destination-prefix xmlns="urn:ietf:params:xml:ns:yang:ietf-ipv6-unicast-routing">fd22::/64</destination-prefix>
+                      <vpp-ipv6-route xmlns="urn:ietf:params:xml:ns:yang:vpp-ipv6-unicast-routing"/>         
+                      <next-hop xmlns="urn:ietf:params:xml:ns:yang:ietf-ipv6-unicast-routing">
+                          <outgoing-interface>host-eth1</outgoing-interface>
+                          <next-hop-address>::</next-hop-address>
+                      </next-hop>
+                    </route>
+                  </ipv6>
+                </static-routes>
+              </control-plane-protocol>
+            </control-plane-protocols>
+          </routing>
+          <interfaces xmlns="urn:ietf:params:xml:ns:yang:ietf-interfaces">
+            <interface>
+              <name>host-eth0</name>
+              <ipv6 xmlns="urn:ietf:params:xml:ns:yang:ietf-ip">
+                <neighbor>
+                  <ip>fd11::100</ip>
+                  <link-layer-address>00:00:00:00:13:10</link-layer-address>
+                </neighbor>
+                <neighbor>
+                  <ip>fd11::101</ip>
+                  <link-layer-address>00:00:00:00:13:10</link-layer-address>
+                </neighbor>
+              </ipv6>
+            </interface>
+            <interface>
+              <name>host-eth1</name>
+              <ipv6 xmlns="urn:ietf:params:xml:ns:yang:ietf-ip">
+                <neighbor>
+                  <ip>fd22::100</ip>
+                  <link-layer-address>00:00:00:00:23:20</link-layer-address>
+                </neighbor>
+                <neighbor>
+                  <ip>fd22::101</ip>
+                  <link-layer-address>00:00:00:00:23:20</link-layer-address>
+                </neighbor>
+              </ipv6>
+            </interface>
+          </interfaces>
+        </config>

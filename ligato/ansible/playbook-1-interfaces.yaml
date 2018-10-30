@@ -1,0 +1,189 @@
+# Copyright (c) 2018 Cisco Systems
+#
+# Author: Steven Barth <stbarth@cisco.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- hosts: localhost
+  gather_facts: no
+  connection: local
+  tasks:
+
+  - name: Configure Node 1 interface eth0
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node1/vpp/config/v1/interface/host-eth0' | b64encode }}"
+        value: >
+          {{ '{
+            "afpacket": {"host_if_name": "eth0"},
+            "enabled": true,
+            "mtu": 1500,
+            "ip_addresses": ["fd12::10/64"],
+            "name": "host-eth0",
+            "phys_address": "00:00:00:00:12:10",
+            "type": 4
+          }' | b64encode }}
+
+  - name: Configure Node 1 interface eth1
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node1/vpp/config/v1/interface/host-eth1' | b64encode }}"
+        value: >
+          {{ '{
+          "afpacket": {"host_if_name": "eth1"},
+          "enabled": true,
+          "mtu": 1500,
+          "ip_addresses": ["fd13::10/64"],
+          "name": "host-eth1",
+          "phys_address": "00:00:00:00:13:10",
+          "type": 4
+          }' | b64encode }}
+
+
+  - name: Configure Node 1 interface vpp
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node1/vpp/config/v1/interface/tapcli-0' | b64encode }}"
+        value: >
+          {{ '{
+            "tap": {"host_if_name": "vpp"},
+            "enabled": true,
+            "mtu": 1500,
+            "ip_addresses": ["fd10::10/64"],
+            "name": "tapcli-0",
+            "phys_address": "00:00:00:00:10:10",
+            "type": 3
+          }' | b64encode }}
+
+
+
+  - name: Configure Node 2 interface eth0
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node2/vpp/config/v1/interface/host-eth0' | b64encode }}"
+        value: >
+          {{ '{
+            "afpacket": {"host_if_name": "eth0"},
+            "enabled": true,
+            "mtu": 1500,
+            "ip_addresses": ["fd12::20/64"],
+            "name": "host-eth0",
+            "phys_address": "00:00:00:00:12:20",
+            "type": 4
+          }' | b64encode }}
+
+  - name: Configure Node 2 interface eth1
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node2/vpp/config/v1/interface/host-eth1' | b64encode }}"
+        value: > 
+          {{ '{
+            "afpacket": {"host_if_name": "eth1"},
+            "enabled": true,
+            "mtu": 1500,
+            "ip_addresses": ["fd23::20/64"],
+            "name": "host-eth1",
+            "phys_address": "00:00:00:00:23:20",
+            "type": 4
+          }' | b64encode }}
+
+
+  - name: Configure Node 2 interface vpp
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node2/vpp/config/v1/interface/tapcli-0' | b64encode }}"
+        value: >
+          {{ '{
+            "tap": {"host_if_name": "vpp"},
+            "enabled": true,
+            "mtu": 1500,
+            "ip_addresses": ["fd20::20/64"],
+            "name": "tapcli-0",
+            "phys_address": "00:00:00:00:20:20",
+            "type": 3
+          }' | b64encode }}
+
+
+
+  - name: Configure Node 3 interface eth0
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node3/vpp/config/v1/interface/host-eth0' | b64encode }}"
+        value: >
+          {{ '{
+            "afpacket": {"host_if_name": "eth0"},
+            "enabled": true,
+            "mtu": 1500,
+            "ip_addresses": ["fd13::30/64"],
+            "name": "host-eth0",
+            "phys_address": "00:00:00:00:13:30",
+            "type": 4
+          }' | b64encode }}
+
+  - name: Configure Node 3 interface eth1
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node3/vpp/config/v1/interface/host-eth1' | b64encode }}"
+        value: > 
+          {{ '{
+            "afpacket": {"host_if_name": "eth1"},
+            "enabled": true,
+            "mtu": 1500,
+            "ip_addresses": ["fd23::30/64"],
+            "name": "host-eth1",
+            "phys_address": "00:00:00:00:23:30",
+            "type": 4
+          }' | b64encode }}
+
+
+  - name: Configure Node 3 interface vpp
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node3/vpp/config/v1/interface/tapcli-0' | b64encode }}"
+        value: >
+          {{ '{
+            "tap": {"host_if_name": "vpp"},
+            "enabled": true,
+            "mtu": 1500,
+            "ip_addresses": ["fd30::30/64"],
+            "name": "tapcli-0",
+            "phys_address": "00:00:00:00:30:30",
+            "type": 3
+          }' | b64encode }}

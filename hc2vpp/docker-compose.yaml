@@ -1,0 +1,133 @@
+# Copyright (c) 2018 Cisco Systems
+#
+# Author: Steven Barth <stbarth@cisco.com>
+# Author: Cristina Precup <cprecup@cisco.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+version: '2.1'
+services:
+  anx:
+    build: anx
+    ports: ["9269:8080"]
+
+  telegraf:
+    build: telegraf
+
+  influxdb:
+    image: influxdb:alpine
+    environment:
+      - INFLUXDB_DB=telemetry
+      - INFLUXDB_ADMIN_PASSWORD=admin
+
+  chronograf:
+    image: chronograf:alpine
+    command: --influxdb-url=http://influxdb:8086 --kapacitor-url=http://kapacitor:9092
+    ports: [ "8888:8888" ]
+
+  kapacitor:
+    image: kapacitor:alpine
+    environment:
+      - KAPACITOR_HOSTNAME=kapacitor
+      - KAPACITOR_INFLUXDB_0_URLS_0=http://influxdb:8086
+    ports: ["9093:9092"]
+
+  ansible:
+    depends_on: ["node1", "node2", "node3"]
+    build: ansible
+
+  node1:
+    build: .
+    ports: ["8301:2831", "4431:8445"]
+    privileged: true
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: 0
+    networks:
+      default:
+        priority: 1000
+
+      node1_node2:
+        ipv4_address: 172.22.12.101
+        ipv6_address: fd12::101
+        priority: 200
+
+      node1_node3:
+        ipv4_address: 172.22.13.101
+        ipv6_address: fd13::101
+        priority: 100
+
+
+  node2:
+    build: .
+    ports: ["8302:2831", "4432:8445"]
+    privileged: true
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: 0
+    networks:
+      default:
+        priority: 1000
+
+      node1_node2:
+        ipv4_address: 172.22.12.102
+        ipv6_address: fd12::102
+        priority: 200
+
+      node2_node3:
+        ipv4_address: 172.22.23.102
+        ipv6_address: fd23::102
+        priority: 100
+
+  node3:
+    build: .
+    ports: ["8303:2831", "4433:8445"]
+    privileged: true
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: 0
+    networks:
+      default:
+        priority: 1000
+
+      node1_node3:
+        ipv4_address: 172.22.13.103
+        ipv6_address: fd13::103
+        priority: 200
+
+      node2_node3:
+        ipv4_address: 172.22.23.103
+        ipv6_address: fd23::103
+        priority: 100
+
+networks:
+  default:
+
+  node1_node2:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 172.22.12.0/24
+        - subnet: fd12::/64
+
+  node1_node3:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 172.22.13.0/24
+        - subnet: fd13::/64
+
+  node2_node3:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 172.22.23.0/24
+        - subnet: fd23::/64
+  

@@ -1,0 +1,233 @@
+# Copyright (c) 2018 Cisco Systems
+#
+# Author: Steven Barth <stbarth@cisco.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- hosts: localhost
+  gather_facts: no
+  connection: local
+  tasks:
+  - name: Configure Node 1 SRv6 Policies
+    netconf_config:
+      host: node1
+      port: 2831
+      hostkey_verify: no
+      username: admin
+      password: admin
+      xml: |
+        <config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+          <segment-routing xmlns="http://cisco.com/ns/yang/oc-srte-policy">
+            <traffic-engineering>
+              <named-segment-lists>
+                <named-segment-list>
+                  <name>fd11::13-1</name>
+                  <config>
+                    <name>fd11::13-1</name>
+                  </config>
+                  <segments>
+                    <segment>
+                      <index>1</index>
+                      <config>
+                        <index>1</index>
+                        <type>type-2</type>
+                        <sid-value>fd33::101</sid-value>
+                      </config>
+                    </segment>
+                  </segments>
+                </named-segment-list>
+              </named-segment-lists>
+              <policies>
+                <policy>
+                  <config>
+                    <name>fd11::13</name>
+                    <color>1</color>
+                    <endpoint>fd30::30</endpoint>
+                  </config>
+                  <color>1</color>
+                  <endpoint>fd30::30</endpoint>
+                  <candidate-paths>
+                    <candidate-path>
+                      <name>candidatePath1</name>
+                      <provisioning-method>provisioning-method-config</provisioning-method>
+                      <preference>1</preference>
+                      <distinguisher>0</distinguisher>
+                      <config>
+                        <name>candidatePath1</name>
+                        <provisioning-method>provisioning-method-config</provisioning-method>
+                        <computation-method>path-explicitly-defined</computation-method>
+                        <preference>1</preference>
+                        <distinguisher>0</distinguisher>
+                      </config>
+                      <binding-sid>
+                        <config>
+                          <alloc-mode>explicit</alloc-mode>
+                          <type>srv6</type>
+                          <value>fd11::13</value>
+                        </config>
+                      </binding-sid>
+                      <segment-lists>
+                        <segment-list>
+                          <name>fd11::13-1</name>
+                          <config>
+                            <name>fd11::13-1</name>
+                            <weight>1</weight>
+                          </config>
+                        </segment-list>
+                      </segment-lists>
+                    </candidate-path>
+                  </candidate-paths>
+                  <autoroute-include>
+                    <config>
+                      <metric-type>constant</metric-type>
+                      <metric-constant>0</metric-constant>
+                    </config>
+                    <prefixes>
+                      <config>
+                        <prefixes-all>false</prefixes-all>
+                      </config>
+                      <prefix>
+                        <ip-prefix>fd30::/127</ip-prefix>
+                        <config>
+                          <ip-prefix>fd30::/127</ip-prefix>
+                        </config>
+                      </prefix>
+                    </prefixes>
+                  </autoroute-include>
+                  <binding-sid>
+                    <config>
+                      <alloc-mode>explicit</alloc-mode>
+                      <type>srv6</type>
+                      <value>fd11::13</value>
+                    </config>
+                  </binding-sid>
+                  <vpp-sr-policy xmlns="urn:hc2vpp:params:xml:ns:yang:vpp-oc-srte-policy">
+                    <config>
+                      <policy-type>Default</policy-type>
+                      <policy-behavior>Encapsulation</policy-behavior>
+                      <table-id>0</table-id>
+                      <address-family xmlns:x="urn:opendaylight:params:xml:ns:yang:vpp-fib-table-management">x:ipv6</address-family>
+                    </config>
+                  </vpp-sr-policy>
+                </policy>
+              </policies>
+            </traffic-engineering>
+          </segment-routing>
+        </config>
+
+  - name: Configure Node 3 SRv6 Policies
+    netconf_config:
+      host: node3
+      port: 2831
+      hostkey_verify: no
+      username: admin
+      password: admin
+      xml: |
+        <config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+          <segment-routing xmlns="http://cisco.com/ns/yang/oc-srte-policy">
+            <traffic-engineering>
+              <named-segment-lists>
+                <named-segment-list>
+                  <name>fd33::31-1</name>
+                  <config>
+                    <name>fd33::31-1</name>
+                  </config>
+                  <segments>
+                    <segment>
+                      <index>1</index>
+                      <config>
+                        <index>1</index>
+                        <type>type-2</type>
+                        <sid-value>fd11::101</sid-value>
+                      </config>
+                    </segment>
+                  </segments>
+                </named-segment-list>
+              </named-segment-lists>
+              <policies>
+                <policy>
+                  <config>
+                    <name>fd33::31</name>
+                    <color>1</color>
+                    <endpoint>fd10::10</endpoint>
+                  </config>
+                  <color>1</color>
+                  <endpoint>fd10::10</endpoint>
+                  <candidate-paths>
+                    <candidate-path>
+                      <name>candidatePath1</name>
+                      <provisioning-method>provisioning-method-config</provisioning-method>
+                      <preference>1</preference>
+                      <distinguisher>0</distinguisher>
+                      <config>
+                        <name>candidatePath1</name>
+                        <provisioning-method>provisioning-method-config</provisioning-method>
+                        <computation-method>path-explicitly-defined</computation-method>
+                        <preference>1</preference>
+                        <distinguisher>0</distinguisher>
+                      </config>
+                      <binding-sid>
+                        <config>
+                          <alloc-mode>explicit</alloc-mode>
+                          <type>srv6</type>
+                          <value>fd33::31</value>
+                        </config>
+                      </binding-sid>
+                      <segment-lists>
+                        <segment-list>
+                          <name>fd33::31-1</name>
+                          <config>
+                            <name>fd33::31-1</name>
+                            <weight>1</weight>
+                          </config>
+                        </segment-list>
+                      </segment-lists>
+                    </candidate-path>
+                  </candidate-paths>
+                  <autoroute-include>
+                    <config>
+                      <metric-type>constant</metric-type>
+                      <metric-constant>0</metric-constant>
+                    </config>
+                    <prefixes>
+                      <config>
+                        <prefixes-all>false</prefixes-all>
+                      </config>
+                      <prefix>
+                        <ip-prefix>fd10::/127</ip-prefix>
+                        <config>
+                          <ip-prefix>fd10::/127</ip-prefix>
+                        </config>
+                      </prefix>
+                    </prefixes>
+                  </autoroute-include>
+                  <binding-sid>
+                    <config>
+                      <alloc-mode>explicit</alloc-mode>
+                      <type>srv6</type>
+                      <value>fd33::31</value>
+                    </config>
+                  </binding-sid>
+                  <vpp-sr-policy xmlns="urn:hc2vpp:params:xml:ns:yang:vpp-oc-srte-policy">
+                    <config>
+                      <policy-type>Default</policy-type>
+                      <policy-behavior>Encapsulation</policy-behavior>
+                      <table-id>0</table-id>
+                      <address-family xmlns:x="urn:opendaylight:params:xml:ns:yang:vpp-fib-table-management">x:ipv6</address-family>
+                    </config>
+                  </vpp-sr-policy>
+                </policy>
+              </policies>
+            </traffic-engineering>
+          </segment-routing>
+        </config>

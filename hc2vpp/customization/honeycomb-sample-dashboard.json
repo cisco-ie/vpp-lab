@@ -1,0 +1,333 @@
+{
+	"meta": {
+		"chronografVersion": "1.6.2",
+		"sources": {
+			"0": {
+				"name": "http://influxdb:8086",
+				"link": "/chronograf/v1/sources/0"
+			}
+		}
+	},
+	"dashboard": {
+		"id": 1,
+		"cells": [
+			{
+				"i": "f0ded5af-a6be-4552-b668-7ca9ffdb5438",
+				"x": 0,
+				"y": 4,
+				"w": 12,
+				"h": 4,
+				"name": "Alerts",
+				"queries": [
+					{
+						"query": "SELECT last(\"past.value\") AS \"last_past.value\", last(\"value\") AS \"last_value\", last(\"current.value\") AS \"last_current.value\" FROM \"chronograf\".\"autogen\".\"alerts\" WHERE time > :dashboardTime: AND (\"alertID\"='Sample Rule:interface=2' OR \"alertID\"='Sample Rule:interface=3') AND (\"interface\"='2' OR \"interface\"='3') AND (\"level\"='CRITICAL' OR \"level\"='OK') GROUP BY time(:interval:), \"alertID\", \"level\" FILL(none)",
+						"queryConfig": {
+							"database": "chronograf",
+							"measurement": "alerts",
+							"retentionPolicy": "autogen",
+							"fields": [
+								{
+									"value": "last",
+									"type": "func",
+									"alias": "last_past.value",
+									"args": [
+										{
+											"value": "past.value",
+											"type": "field",
+											"alias": ""
+										}
+									]
+								},
+								{
+									"value": "last",
+									"type": "func",
+									"alias": "last_value",
+									"args": [
+										{
+											"value": "value",
+											"type": "field",
+											"alias": ""
+										}
+									]
+								},
+								{
+									"value": "last",
+									"type": "func",
+									"alias": "last_current.value",
+									"args": [
+										{
+											"value": "current.value",
+											"type": "field",
+											"alias": ""
+										}
+									]
+								}
+							],
+							"tags": {
+								"alertID": [
+									"Sample Rule:interface=2",
+									"Sample Rule:interface=3"
+								],
+								"interface": [
+									"2",
+									"3"
+								],
+								"level": [
+									"CRITICAL",
+									"OK"
+								]
+							},
+							"groupBy": {
+								"time": "auto",
+								"tags": [
+									"alertID",
+									"level"
+								]
+							},
+							"areTagsAccepted": true,
+							"fill": "none",
+							"rawText": null,
+							"range": null,
+							"shifts": null
+						},
+						"source": "/chronograf/v1/sources/0"
+					}
+				],
+				"axes": {
+					"x": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y2": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					}
+				},
+				"type": "table",
+				"colors": [
+					{
+						"id": "base",
+						"type": "text",
+						"hex": "#00C9FF",
+						"name": "laser",
+						"value": "-1000000000000000000"
+					}
+				],
+				"legend": {},
+				"tableOptions": {
+					"verticalTimeAxis": true,
+					"sortBy": {
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					},
+					"wrapping": "truncate",
+					"fixFirstColumn": true
+				},
+				"fieldOptions": [
+					{
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					},
+					{
+						"internalName": "alertID",
+						"displayName": "",
+						"visible": true
+					},
+					{
+						"internalName": "alerts.last_past.value",
+						"displayName": "",
+						"visible": true
+					},
+					{
+						"internalName": "alerts.last_value",
+						"displayName": "alert.difference",
+						"visible": true
+					},
+					{
+						"internalName": "alerts.last_current.value",
+						"displayName": "",
+						"visible": true
+					},
+					{
+						"internalName": "level",
+						"displayName": "",
+						"visible": true
+					}
+				],
+				"timeFormat": "DD/MM/YYYY HH:mm:ss",
+				"decimalPlaces": {
+					"isEnforced": false,
+					"digits": 2
+				},
+				"links": {
+					"self": "/chronograf/v1/dashboards/1/cells/f0ded5af-a6be-4552-b668-7ca9ffdb5438"
+				}
+			},
+			{
+				"i": "69f21dea-f71c-4e70-a55f-d6f24c467f99",
+				"x": 0,
+				"y": 0,
+				"w": 12,
+				"h": 4,
+				"name": "IF IP6 counter",
+				"queries": [
+					{
+						"query": "SELECT last(\"counter\") AS \"last_counter\" FROM \"telemetry\".\"autogen\".\"_if_ip6\" WHERE time > :dashboardTime: GROUP BY time(:interval:), \"interface\" FILL(null)",
+						"queryConfig": {
+							"database": "telemetry",
+							"measurement": "_if_ip6",
+							"retentionPolicy": "autogen",
+							"fields": [
+								{
+									"value": "last",
+									"type": "func",
+									"alias": "last_counter",
+									"args": [
+										{
+											"value": "counter",
+											"type": "field",
+											"alias": ""
+										}
+									]
+								}
+							],
+							"tags": {},
+							"groupBy": {
+								"time": "auto",
+								"tags": [
+									"interface"
+								]
+							},
+							"areTagsAccepted": false,
+							"fill": "null",
+							"rawText": null,
+							"range": null,
+							"shifts": null
+						},
+						"source": "/chronograf/v1/sources/0"
+					}
+				],
+				"axes": {
+					"x": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y2": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					}
+				},
+				"type": "line",
+				"colors": [
+					{
+						"id": "534e5773-742c-4e4c-9b33-72ef3651bbc2",
+						"type": "scale",
+						"hex": "#FD7A5D",
+						"name": "Delorean",
+						"value": "0"
+					},
+					{
+						"id": "9498a5ec-0f4f-4b76-9032-51b616818f37",
+						"type": "scale",
+						"hex": "#5F1CF2",
+						"name": "Delorean",
+						"value": "0"
+					},
+					{
+						"id": "ac4da386-7dc2-4149-852f-edd025469cef",
+						"type": "scale",
+						"hex": "#4CE09A",
+						"name": "Delorean",
+						"value": "0"
+					}
+				],
+				"legend": {},
+				"tableOptions": {
+					"verticalTimeAxis": true,
+					"sortBy": {
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					},
+					"wrapping": "truncate",
+					"fixFirstColumn": true
+				},
+				"fieldOptions": [
+					{
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					}
+				],
+				"timeFormat": "MM/DD/YYYY HH:mm:ss",
+				"decimalPlaces": {
+					"isEnforced": true,
+					"digits": 2
+				},
+				"links": {
+					"self": "/chronograf/v1/dashboards/1/cells/69f21dea-f71c-4e70-a55f-d6f24c467f99"
+				}
+			}
+		],
+		"templates": [],
+		"name": "Honeycomb Sample Dashboard",
+		"organization": "default",
+		"links": {
+			"self": "/chronograf/v1/dashboards/1",
+			"cells": "/chronograf/v1/dashboards/1/cells",
+			"templates": "/chronograf/v1/dashboards/1/templates"
+		}
+	}
+}

@@ -1,0 +1,189 @@
+# Copyright (c) 2018 Cisco Systems
+#
+# Author: Steven Barth <stbarth@cisco.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- hosts: localhost
+  gather_facts: no
+  connection: local
+  tasks:
+  - name: Configure Node 1 SRv6 SIDs
+    netconf_config:
+      host: node1
+      port: 2831
+      hostkey_verify: no
+      username: admin
+      password: admin
+      xml: |
+        <config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+          <routing xmlns="urn:ietf:params:xml:ns:yang:ietf-routing">
+            <srv6 xmlns="urn:ietf:params:xml:ns:yang:ietf-srv6-base">
+              <locators>
+                <locator>
+                  <name>fd11::</name>
+                  <enable>true</enable>
+                  <is-default>false</is-default>
+                  <prefix>
+                    <address>fd11::</address>
+                    <length>64</length>-
+                  </prefix>
+                  <static xmlns="urn:ietf:params:xml:ns:yang:ietf-srv6-static">
+                    <local-sids>
+                      <sid>
+                        <opcode>256</opcode> <!-- ::100 -->
+                        <end-behavior-type xmlns:ietf-srv6-types="urn:ietf:params:xml:ns:yang:ietf-srv6-types">ietf-srv6-types:End</end-behavior-type>
+                        <end/>
+                      </sid>
+                      <sid>
+                        <opcode>257</opcode> <!-- ::101 -->
+                        <end-behavior-type xmlns:ietf-srv6-types="urn:ietf:params:xml:ns:yang:ietf-srv6-types">ietf-srv6-types:End.DX6</end-behavior-type>
+                        <end-dx6>
+                          <paths>
+                            <path>
+                              <path-index>1</path-index>
+                              <interface>tapcli-0</interface>
+                              <next-hop>fd10::1</next-hop>
+                              <weight>1</weight>
+                              <role>PRIMARY</role>
+                            </path>
+                          </paths>
+                        </end-dx6>
+                      </sid>
+                    </local-sids>
+                  </static>
+                  <fib-table xmlns="urn:hc2vpp:params:xml:ns:yang:vpp-ietf-srv6-base">
+                    <table-id>0</table-id>
+                    <address-family xmlns:vpp-fib-table-management="urn:opendaylight:params:xml:ns:yang:vpp-fib-table-management">vpp-fib-table-management:ipv6</address-family>
+                  </fib-table>
+                </locator>
+              </locators>
+            </srv6>
+          </routing>
+        </config>
+
+  - name: Configure Node 2 SRv6 SIDs
+    netconf_config:
+      host: node2
+      port: 2831
+      hostkey_verify: no
+      username: admin
+      password: admin
+      xml: |
+        <config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+          <routing xmlns="urn:ietf:params:xml:ns:yang:ietf-routing">
+            <srv6 xmlns="urn:ietf:params:xml:ns:yang:ietf-srv6-base">
+              <encapsulation>
+                <source-address>fd20::1</source-address>
+                <ip-ttl-propagation>false</ip-ttl-propagation>
+              </encapsulation>
+              <locators>
+                <locator>
+                  <name>fd22::</name>
+                  <enable>true</enable>
+                  <is-default>false</is-default>
+                  <prefix>
+                    <address>fd22::</address>
+                    <length>64</length>-
+                  </prefix>
+                  <static xmlns="urn:ietf:params:xml:ns:yang:ietf-srv6-static">
+                    <local-sids>
+                      <sid>
+                        <opcode>256</opcode> <!-- ::100 -->
+                        <end-behavior-type xmlns:ietf-srv6-types="urn:ietf:params:xml:ns:yang:ietf-srv6-types">ietf-srv6-types:End</end-behavior-type>
+                        <end/>
+                      </sid>
+                      <sid>
+                        <opcode>257</opcode> <!-- ::101 -->
+                        <end-behavior-type xmlns:ietf-srv6-types="urn:ietf:params:xml:ns:yang:ietf-srv6-types">ietf-srv6-types:End.DX6</end-behavior-type>
+                        <end-dx6>
+                          <paths>
+                            <path>
+                              <path-index>1</path-index>
+                              <interface>tapcli-0</interface>
+                              <next-hop>fd20::1</next-hop>
+                              <weight>1</weight>
+                              <role>PRIMARY</role>
+                            </path>
+                          </paths>
+                        </end-dx6>
+                      </sid>
+                    </local-sids>
+                  </static>
+                  <fib-table xmlns="urn:hc2vpp:params:xml:ns:yang:vpp-ietf-srv6-base">
+                    <table-id>0</table-id>
+                    <address-family xmlns:vpp-fib-table-management="urn:opendaylight:params:xml:ns:yang:vpp-fib-table-management">vpp-fib-table-management:ipv6</address-family>
+                  </fib-table>
+                </locator>
+              </locators>
+            </srv6>
+          </routing>
+        </config>
+
+  - name: Configure Node 3 SRv6 SIDs
+    netconf_config:
+      host: node3
+      port: 2831
+      hostkey_verify: no
+      username: admin
+      password: admin
+      xml: |
+        <config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+          <routing xmlns="urn:ietf:params:xml:ns:yang:ietf-routing">
+            <srv6 xmlns="urn:ietf:params:xml:ns:yang:ietf-srv6-base">
+              <encapsulation>
+                <source-address>fd30::1</source-address>
+                <ip-ttl-propagation>false</ip-ttl-propagation>
+              </encapsulation>
+              <locators>
+                <locator>
+                  <name>fd33::</name>
+                  <enable>true</enable>
+                  <is-default>false</is-default>
+                  <prefix>
+                    <address>fd33::</address>
+                    <length>64</length>-
+                  </prefix>
+                  <static xmlns="urn:ietf:params:xml:ns:yang:ietf-srv6-static">
+                    <local-sids>
+                      <sid>
+                        <opcode>256</opcode> <!-- ::100 -->
+                        <end-behavior-type xmlns:ietf-srv6-types="urn:ietf:params:xml:ns:yang:ietf-srv6-types">ietf-srv6-types:End</end-behavior-type>
+                        <end/>
+                      </sid>
+                      <sid>
+                        <opcode>257</opcode> <!-- ::101 -->
+                        <end-behavior-type xmlns:ietf-srv6-types="urn:ietf:params:xml:ns:yang:ietf-srv6-types">ietf-srv6-types:End.DX6</end-behavior-type>
+                        <end-dx6>
+                          <paths>
+                            <path>
+                              <path-index>1</path-index>
+                              <interface>tapcli-0</interface>
+                              <next-hop>fd30::1</next-hop>
+                              <weight>1</weight>
+                              <role>PRIMARY</role>
+                            </path>
+                          </paths>
+                        </end-dx6>
+                      </sid>
+                    </local-sids>
+                  </static>
+                  <fib-table xmlns="urn:hc2vpp:params:xml:ns:yang:vpp-ietf-srv6-base">
+                    <table-id>0</table-id>
+                    <address-family xmlns:vpp-fib-table-management="urn:opendaylight:params:xml:ns:yang:vpp-fib-table-management">vpp-fib-table-management:ipv6</address-family>
+                  </fib-table>
+                </locator>
+              </locators>
+            </srv6>
+          </routing>
+        </config>

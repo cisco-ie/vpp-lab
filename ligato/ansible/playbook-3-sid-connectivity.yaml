@@ -1,0 +1,371 @@
+# Copyright (c) 2018 Cisco Systems
+#
+# Author: Steven Barth <stbarth@cisco.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- hosts: localhost
+  gather_facts: no
+  connection: local
+  tasks:
+
+  - name: Configure Node 1 SID route to Node 2
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node1/vpp/config/v1/vrf/0/fib/fd22::100/128/fd22::100' | b64encode }}"
+        value: >
+          {{ '{
+            "dst_ip_addr": "fd22::100/128",
+            "next_hop_addr": "fd22::100",
+            "outgoing_interface": "host-eth0"
+          }' | b64encode }}
+
+  - name: Configure Node 1 SID route to Node 2
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node1/vpp/config/v1/vrf/0/fib/fd22::101/128/fd22::101' | b64encode }}"
+        value: >
+          {{ '{
+            "dst_ip_addr": "fd22::101/128",
+            "next_hop_addr": "fd22::101",
+            "outgoing_interface": "host-eth0"
+          }' | b64encode }}
+
+  - name: Configure Node 1 SID route to Node 3
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node1/vpp/config/v1/vrf/0/fib/fd33::100/128/fd33::100' | b64encode }}"
+        value: >
+          {{ '{
+            "dst_ip_addr": "fd33::100",
+            "next_hop_addr": "fd33::100",
+            "outgoing_interface": "host-eth1"
+          }' | b64encode }}
+
+  - name: Configure Node 1 SID route to Node 3
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node1/vpp/config/v1/vrf/0/fib/fd33::101/128/fd33::101' | b64encode }}"
+        value: >
+          {{ '{
+            "dst_ip_addr": "fd33::101",
+            "next_hop_addr": "fd33::101",
+            "outgoing_interface": "host-eth1"
+          }' | b64encode }}
+
+
+  - name: Configure Node 1 neighbor SID 1
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node1/vpp/config/v1/arp/host-eth0/fd22::100' | b64encode }}"
+        value: >
+          {{ '{
+            "interface": "host-eth0",
+            "ip_address": "fd22::100",
+            "phys_address": "00:00:00:00:12:20",
+            "static": true
+          }' | b64encode }}
+
+  - name: Configure Node 1 neighbor SID 2
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node1/vpp/config/v1/arp/host-eth0/fd22::101' | b64encode }}"
+        value: >
+          {{ '{
+            "interface": "host-eth0",
+            "ip_address": "fd22::101",
+            "phys_address": "00:00:00:00:12:20",
+            "static": true
+          }' | b64encode }}
+
+  - name: Configure Node 1 neighbor SID 3
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node1/vpp/config/v1/arp/host-eth1/fd33::100' | b64encode }}"
+        value: >
+          {{ '{
+            "interface": "host-eth1",
+            "ip_address": "fd33::100",
+            "phys_address": "00:00:00:00:13:30",
+            "static": true
+          }' | b64encode }}
+
+  - name: Configure Node 1 neighbor SID 4
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node1/vpp/config/v1/arp/host-eth1/fd33::101' | b64encode }}"
+        value: >
+          {{ '{
+            "interface": "host-eth1",
+            "ip_address": "fd33::101",
+            "phys_address": "00:00:00:00:13:30",
+            "static": true
+          }' | b64encode }}
+
+
+  - name: Configure Node 2 SID route to Node 1
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node2/vpp/config/v1/vrf/0/fib/fd11::100/128/fd11::100' | b64encode }}"
+        value: >
+          {{ '{
+            "dst_ip_addr": "fd11::100/128",
+            "next_hop_addr": "fd11::100",
+            "outgoing_interface": "host-eth0"
+          }' | b64encode }}
+
+  - name: Configure Node 2 SID route to Node 1
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node2/vpp/config/v1/vrf/0/fib/fd11::101/128/fd11::101' | b64encode }}"
+        value: >
+          {{ '{
+            "dst_ip_addr": "fd11::101/128",
+            "next_hop_addr": "fd11::101",
+            "outgoing_interface": "host-eth0"
+          }' | b64encode }}
+
+  - name: Configure Node 2 SID route to Node 3
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node2/vpp/config/v1/vrf/0/fib/fd33::100/128/fd33::100' | b64encode }}"
+        value: >
+          {{ '{
+            "dst_ip_addr": "fd33::100/128",
+            "next_hop_addr": "fd33::100",
+            "outgoing_interface": "host-eth1"
+          }' | b64encode }}
+
+  - name: Configure Node 2 SID route to Node 3
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node2/vpp/config/v1/vrf/0/fib/fd33::101/128/fd33::101' | b64encode }}"
+        value: >
+          {{ '{
+            "dst_ip_addr": "fd33::101/128",
+            "next_hop_addr": "fd33::101",
+            "outgoing_interface": "host-eth1"
+          }' | b64encode }}
+
+  - name: Configure Node 2 neighbor SID 1
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node2/vpp/config/v1/arp/host-eth0/fd11::100' | b64encode }}"
+        value: >
+          {{ '{
+            "interface": "host-eth0",
+            "ip_address": "fd11::100",
+            "phys_address": "00:00:00:00:12:10",
+            "static": true
+          }' | b64encode }}
+
+  - name: Configure Node 2 neighbor SID 2
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node2/vpp/config/v1/arp/host-eth0/fd11::101' | b64encode }}"
+        value: >
+          {{ '{
+            "interface": "host-eth0",
+            "ip_address": "fd11::101",
+            "phys_address": "00:00:00:00:12:10",
+            "static": true
+          }' | b64encode }}
+
+  - name: Configure Node 2 neighbor SID 3
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node2/vpp/config/v1/arp/host-eth1/fd33::100' | b64encode }}"
+        value: >
+          {{ '{
+            "interface": "host-eth1",
+            "ip_address": "fd33::100",
+            "phys_address": "00:00:00:00:23:30",
+            "static": true
+          }' | b64encode }}
+
+  - name: Configure Node 2 neighbor SID 4
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node2/vpp/config/v1/arp/host-eth1/fd33::101' | b64encode }}"
+        value: >
+          {{ '{
+            "interface": "host-eth1",
+            "ip_address": "fd33::101",
+            "phys_address": "00:00:00:00:23:30",
+            "static": true
+          }' | b64encode }}
+
+  - name: Configure Node 3 SID route to Node 1
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node3/vpp/config/v1/vrf/0/fib/fd11::100/128/fd11::100' | b64encode }}"
+        value: >
+          {{ '{
+            "dst_ip_addr": "fd11::100/128",
+            "next_hop_addr": "fd11::100",
+            "outgoing_interface": "host-eth0"
+          }' | b64encode }}
+
+  - name: Configure Node 3 SID route to Node 1
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node3/vpp/config/v1/vrf/0/fib/fd11::101/128/fd11::101' | b64encode }}"
+        value: >
+          {{ '{
+            "dst_ip_addr": "fd11::101/128",
+            "next_hop_addr": "fd11::101",
+            "outgoing_interface": "host-eth0"
+          }' | b64encode }}
+
+  - name: Configure Node 3 SID route to Node 2
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node3/vpp/config/v1/vrf/0/fib/fd22::100/128/fd22::100' | b64encode }}"
+        value: >
+          {{ '{
+            "dst_ip_addr": "fd22::100/128",
+            "next_hop_addr": "fd22::100",
+            "outgoing_interface": "host-eth1"
+          }' | b64encode }}
+
+  - name: Configure Node 3 SID route to Node 2
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node3/vpp/config/v1/vrf/0/fib/fd22::101/128/fd22::101' | b64encode }}"
+        value: >
+          {{ '{
+            "dst_ip_addr": "fd22::101/128",
+            "next_hop_addr": "fd22::101",
+            "outgoing_interface": "host-eth1"
+          }' | b64encode }}
+
+  - name: Configure Node 3 neighbor SID 1
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node3/vpp/config/v1/arp/host-eth0/fd11::100' | b64encode }}"
+        value: >
+          {{ '{
+            "interface": "host-eth0",
+            "ip_address": "fd11::100",
+            "phys_address": "00:00:00:00:13:10",
+            "static": true
+          }' | b64encode }}
+
+  - name: Configure Node 3 neighbor SID 2
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node3/vpp/config/v1/arp/host-eth0/fd11::101' | b64encode }}"
+        value: >
+          {{ '{
+            "interface": "host-eth0",
+            "ip_address": "fd11::101",
+            "phys_address": "00:00:00:00:13:10",
+            "static": true
+          }' | b64encode }}
+
+  - name: Configure Node 3 neighbor SID 3
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node3/vpp/config/v1/arp/host-eth1/fd22::100' | b64encode }}"
+        value: >
+          {{ '{
+            "interface": "host-eth1",
+            "ip_address": "fd22::100",
+            "phys_address": "00:00:00:00:23:20",
+            "static": true
+          }' | b64encode }}
+
+  - name: Configure Node 3 neighbor SID 4
+    uri:
+      url: http://etcd:2379/v3beta/kv/put
+      method: POST
+      body_format: json
+      body:
+        key: "{{ '/vnf-agent/node3/vpp/config/v1/arp/host-eth1/fd22::101' | b64encode }}"
+        value: >
+          {{ '{
+            "interface": "host-eth1",
+            "ip_address": "fd22::101",
+            "phys_address": "00:00:00:00:23:20",
+            "static": true
+          }' | b64encode }}
+
